@@ -6,53 +6,46 @@ import javax.swing.SwingUtilities
 import kotlin.math.pow
 import kotlin.random.Random
 
-class Logic(private val itemType: String?, private val jobType: String?, private val itemLevel: Int?) {
+class Logic(
+    val itemType: String?,
+    val jobType: String?,
+    val itemLevel: Int?) {
     private var strength = 0
     private var dexterity = 0
     private var intelligence = 0
     private var luck = 0
 
-    private var stat = when (jobType) {
+    // 직업에 따라 스탯 할당
+    var stat = when (jobType) {
         "전사" -> strength
         "궁수" -> dexterity
         "마법사" -> intelligence
-        else -> luck
+        else -> luck // 도적
     }
 
-    fun statName(): String {
-        return when (jobType) {
-            "전사" -> "STR"
-            "궁수" -> "DEX"
-            "마법사" -> "INT"
-            else -> "LUK" // 도적
-        }
+    var statName = when (jobType) {
+        "전사" -> "STR"
+        "궁수" -> "DEX"
+        "마법사" -> "INT"
+        else -> "LUK" // 도적
     }
 
-    private var enhancingLevel = 0
-    fun getEnhancingLevel(): Int {
-        return enhancingLevel
-    }
+    var enhancingLevel = 0
 
-    private var ap = 0 // 공격력
-    private var mp = 0 // 마력
-    private var power = when (jobType) {
+    private var ap = 0 // 공격력(attack power)
+    private var mp = 0 // 마력(magic power)
+    var def = 0 // 방어력
+    var power = when (jobType) {
         "마법사" -> mp
         else -> ap // 전사, 궁수, 도적
     }
 
-    fun powerName(): String {
-        return when (jobType) {
+    var powerOrDefenceName = when (itemType) {
+        "무기" -> when (jobType) {
             "마법사" -> "마력"
             else -> "공격력" // 전사, 궁수, 도적
         }
-    }
-
-    private var def = 0 // 방어력
-    private fun getDef(): Int {
-        return def
-    }
-    fun defName(): String {
-        return "방어력"
+        else -> "방어력" // 방어구
     }
 
     private var enhancingCost = itemLevel?.let { cost(it, enhancingLevel) }
@@ -66,15 +59,8 @@ class Logic(private val itemType: String?, private val jobType: String?, private
     }
 
     // 최종 강화화면에 표시할 내용
-    private var successCount = 0
-    fun getSuccessCount(): Int {
-        return successCount
-    }
-    private var failureCount = 0
-    fun getFailureCount(): Int {
-        return failureCount
-    }
-
+    var successCount = 0
+    var failureCount = 0
 
     data class EnhancingData(
         var successChance: (Int) -> Double,
@@ -82,10 +68,24 @@ class Logic(private val itemType: String?, private val jobType: String?, private
         val cost: (Int, Int) -> Int
     )
 
+    fun updateSuccessChance() {
+        val miniGame = MiniGame()
+        // 미니게임 실행 후 정답 개수 가져오기
+        val correctCount = miniGame.getCorrect()
+        val bonus = correctCount * 0.0125
+        enhancingData = (0..24).associateWith {
+            EnhancingData(
+                successChance = { enhancingLevel -> successChance(enhancingLevel, bonus) },
+                failureChance = { enhancingLevel -> failureChance(enhancingLevel, bonus) },
+                cost = { itemLevel, enhancingLevel -> cost(itemLevel, enhancingLevel) }
+            )
+        }
+    }
+
     private var enhancingData = (0..24).associateWith {
         EnhancingData(
-            successChance = { enhancingLevel -> successChance(enhancingLevel) },
-            failureChance = { enhancingLevel -> failureChance(enhancingLevel) },
+            successChance = { enhancingLevel -> successChance(enhancingLevel, 0.0) },
+            failureChance = { enhancingLevel -> failureChance(enhancingLevel, 0.0) },
             cost = { itemLevel, enhancingLevel -> cost(itemLevel, enhancingLevel) }
         )
     }
@@ -106,10 +106,7 @@ class Logic(private val itemType: String?, private val jobType: String?, private
         }
     }
 
-    private fun successChance(enhancingLevel: Int): Double {
-        val miniGame = MiniGame()
-        val crtPoint = miniGame.getCorrect()
-        val bonus = crtPoint * 0.0125
+    private fun successChance(enhancingLevel: Int, bonus: Double): Double {
         return when (enhancingLevel) {
             in 0 until 3 -> (0.95 - 0.05 * enhancingLevel) * (1 + bonus)
             in 3 until 15 -> (1 - 0.05 * enhancingLevel) * (1 + bonus)
@@ -120,59 +117,61 @@ class Logic(private val itemType: String?, private val jobType: String?, private
             else -> throw IllegalArgumentException("Invalid enhancingLevel")
         }
     }
+
     fun getSuccessChance(): String {
-        return String.format("%.2f", successChance(enhancingLevel) * 100)
+        val successChance = enhancingData[enhancingLevel]?.successChance?.invoke(enhancingLevel) ?: 0.0
+        return String.format("%.2f", successChance/*(enhancingLevel)*/ * 100)
     }
 
-    private fun failureChance(enhancingLevel: Int): Double {
-        return 1 - successChance(enhancingLevel)
+    private fun failureChance(enhancingLevel: Int, bonus: Double): Double {
+        return 1 - successChance(enhancingLevel, bonus)
     }
+
     fun getFailureChance(): String {
-        return String.format("%.2f", failureChance(enhancingLevel) * 100)
+        val failureChance = enhancingData[enhancingLevel]?.failureChance?.invoke(enhancingLevel) ?: 0.0
+        return String.format("%.2f", failureChance/*(enhancingLevel)*/ * 100)
     }
 
-    private var statIncrease = 20
-    fun getStatIncrease(): Int {
-        return statIncrease
+    var statIncrease = 20
+    var powerIncrease = 10
+    var defIncrease = 10
+
+    // 아이템 레벨에 따른 최대 강화 단계 설정
+    val maxEnhancingLevel = when(itemLevel) {
+        in Int.MIN_VALUE until 110 -> 5
+        in 110 until 120 -> 10
+        in 120 until 130 -> 15
+        in 130 until 140 -> 20
+        else -> 25
     }
 
-    private var powerIncrease = 10
-    fun getPowerIncrease(): Int {
-        return powerIncrease
-    }
-
-    private var defIncrease = 10
-    fun getDefIncrease(): Int {
-        return defIncrease
-    }
 
     fun simulateItem() {
-        val maxEnhancingLevel = when(itemLevel!!) {
-            in Int.MIN_VALUE until 110 -> 5
-            in 110 until 120 -> 10
-            in 120 until 130 -> 15
-            in 130 until 140 -> 20
-            else -> 25
-        }
 
+        // 현재 강화 단계 < 최대 강화 단계
         if (enhancingLevel < maxEnhancingLevel) {
             val currentEnhancingData = enhancingData[enhancingLevel]
                 ?: error("No data for enhancing level $enhancingLevel")
 
+            // 맨 처음 강화 시도
             if (enhancingLevel == 0 && successCount == 0 && failureCount == 0) {
-                enhancingCost = currentEnhancingData.cost(itemLevel, enhancingLevel)
+                enhancingCost = currentEnhancingData.cost(itemLevel!!, enhancingLevel)
             }
+
             val chance = Random.nextDouble()
+            val bonus = (enhancingData[enhancingLevel]?.
+            successChance?.invoke(enhancingLevel) ?: 0.0) - successChance(enhancingLevel, 0.0)
 
             //강화 성공
-            if (chance < currentEnhancingData.successChance(enhancingLevel)) {
+            if (chance < currentEnhancingData.successChance(enhancingLevel) + bonus) {
                 enhancingLevel++
                 successCount++
-                enhancingCost = currentEnhancingData.cost(itemLevel, enhancingLevel)
+                enhancingCost = currentEnhancingData.cost(itemLevel!!, enhancingLevel)
+                stat += statIncrease
 
                 when (itemType) {
-                    "무기" -> { stat += statIncrease; power += powerIncrease }
-                    else -> { stat += statIncrease; def += defIncrease } // 방어구
+                    "무기" -> power += powerIncrease
+                    else -> def += defIncrease// 방어구
                 }
             }
 
@@ -181,23 +180,21 @@ class Logic(private val itemType: String?, private val jobType: String?, private
                 // 0강, 10강, 15강, 20강에서 강화 실패 시 강화 단계 유지
                 if ((enhancingLevel == 0 || enhancingLevel == 10 || enhancingLevel == 15 || enhancingLevel == 20)) {
                     failureCount++
-                    enhancingCost = currentEnhancingData.cost(itemLevel, enhancingLevel)
+                    enhancingCost = currentEnhancingData.cost(itemLevel!!, enhancingLevel)
                 }
                 else { //그 이외에는 하락
                     enhancingLevel--
                     failureCount++
-                    enhancingCost = currentEnhancingData.cost(itemLevel, enhancingLevel)
+                    enhancingCost = currentEnhancingData.cost(itemLevel!!, enhancingLevel)
+                    stat -= statIncrease
 
                     when (itemType) {
-                        "무기" -> { stat -= statIncrease; power -= powerIncrease }
-                        else -> { stat -= statIncrease; def -= defIncrease } // 방어구
+                        "무기" -> power -= powerIncrease
+                        else -> def -= defIncrease // 방어구
                     }
                 }
             }
             totalCost += currentEnhancingData.cost(itemLevel, enhancingLevel)
-        }
-        else {
-            //todo
         }
     }
 }
@@ -207,9 +204,9 @@ fun main() {
         val itemSelectingUI = ItemSelectingUI()
         itemSelectingUI.isVisible = false
 
-        val it = itemSelectingUI.getSelectedItemType()
-        val jt = itemSelectingUI.getSelectedJobType()
-        val il = itemSelectingUI.getSelectedLevel()
+        val it = itemSelectingUI.selectedItemType
+        val jt = itemSelectingUI.selectedJobType
+        val il = itemSelectingUI.selectedLevel
         val logic = Logic(it, jt, il)
         logic.simulateItem()
     }
