@@ -3,21 +3,17 @@ package kr.mjc.junghoon.javacapstonedesign
 import javax.swing.*
 import java.awt.*
 import java.awt.event.*
-import kotlin.system.exitProcess
 
 class MiniGame : JFrame() {
 
     private val countdownLabel = JLabel("5")
     private var countdown = 5
     private var timer: Timer? = null
-    private var correct = 0
-    fun getCorrect(): Int {
-        return correct
-    }
+    var correctCount = 0
 
     init {
         title = "Mini Game"
-        defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        defaultCloseOperation = EXIT_ON_CLOSE
         setSize(600, 400)
         layout = BorderLayout()
 
@@ -99,18 +95,20 @@ class MiniGame : JFrame() {
         val arrowPanel = (contentPane.components.find { it is JPanel } as? JPanel)?.
         components?.getOrNull(1) as? JPanel
         val arrowLabels = arrowPanel?.components?.mapNotNull { it as? JLabel }
-        if (arrowLabels != null && arrowLabels.size > correct) {
-            val arrowLabel = arrowLabels[correct]
+        if (arrowLabels != null && arrowLabels.size > correctCount) {
+            val arrowLabel = arrowLabels[correctCount]
             if (direction == arrowLabel.icon.toString()) {
                 arrowLabel.isVisible = false
-                correct++
-                println("Correct guess: $correct")
-                if (correct == 4) {
-                    println("Game Over")
-                    exitProcess(0)
+                correctCount++
+                if (correctCount == 4) {
+                    dispose()
                 }
             }
         }
+    }
+
+    fun getCorrect(): Int {
+        return correctCount
     }
 
     companion object {
@@ -123,3 +121,4 @@ class MiniGame : JFrame() {
         }
     }
 }
+
