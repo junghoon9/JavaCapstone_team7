@@ -9,10 +9,10 @@ class EnhancingUI(private val itemType: String?,
                   private val logic: Logic) : JFrame() {
     private val startButton = JButton("강화 시작")
     private val endButton = JButton("강화 종료")
-    private val miniGameCheckBox = JCheckBox("미니게임 실행")
+    val miniGameCheckBox = JCheckBox("미니게임 실행")
     private var enhancingInfoLabel = JLabel()
 
-    private fun updateEnhancingInfo(logic: Logic) {
+    fun updateEnhancingInfo(logic: Logic) {
         // logic 객체에서 강화 정보 가져오기
         val ehcLevel = logic.enhancingLevel
         val statN = logic.statName
@@ -155,12 +155,13 @@ class EnhancingUI(private val itemType: String?,
         startButton.addActionListener{
             if (itemType != null && jobType != null && itemLevel != null) {
                 if (miniGameCheckBox.isSelected) {
-                    val miniGame = MiniGame()
+                    val miniGame = MiniGame(this@EnhancingUI, logic)
                     miniGame.isVisible = true
-                    logic.updateSuccessChance()
                 }
-                logic.simulateItem()
-                this@EnhancingUI.updateEnhancingInfo(logic)
+                else {
+                    logic.simulateItem()
+                    this@EnhancingUI.updateEnhancingInfo(logic)
+                }
             }
         }
 
