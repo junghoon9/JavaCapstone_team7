@@ -68,10 +68,7 @@ class Logic(
         val cost: (Int, Int) -> Int
     )
 
-    fun updateSuccessChance() {
-        val miniGame = MiniGame()
-        // 미니게임 실행 후 정답 개수 가져오기
-        val correctCount = miniGame.getCorrect()
+    fun updateSuccessChance(correctCount: Int) {
         val bonus = correctCount * 0.0125
         enhancingData = (0..24).associateWith {
             EnhancingData(
@@ -81,6 +78,17 @@ class Logic(
             )
         }
     }
+
+    fun resetSuccessChance() {
+        enhancingData = (0..24).associateWith {
+            EnhancingData(
+                successChance = { enhancingLevel -> successChance(enhancingLevel, 0.0) },
+                failureChance = { enhancingLevel -> failureChance(enhancingLevel, 0.0) },
+                cost = { itemLevel, enhancingLevel -> cost(itemLevel, enhancingLevel) }
+            )
+        }
+    }
+
 
     private var enhancingData = (0..24).associateWith {
         EnhancingData(
@@ -120,7 +128,7 @@ class Logic(
 
     fun getSuccessChance(): String {
         val successChance = enhancingData[enhancingLevel]?.successChance?.invoke(enhancingLevel) ?: 0.0
-        return String.format("%.2f", successChance/*(enhancingLevel)*/ * 100)
+        return String.format("%.2f", successChance * 100)
     }
 
     private fun failureChance(enhancingLevel: Int, bonus: Double): Double {
@@ -129,7 +137,7 @@ class Logic(
 
     fun getFailureChance(): String {
         val failureChance = enhancingData[enhancingLevel]?.failureChance?.invoke(enhancingLevel) ?: 0.0
-        return String.format("%.2f", failureChance/*(enhancingLevel)*/ * 100)
+        return String.format("%.2f", failureChance * 100)
     }
 
     var statIncrease = 20
@@ -173,6 +181,8 @@ class Logic(
                     "무기" -> power += powerIncrease
                     else -> def += defIncrease// 방어구
                 }
+
+                resetSuccessChance()
             }
 
             //강화 실패
@@ -192,6 +202,8 @@ class Logic(
                         "무기" -> power -= powerIncrease
                         else -> def -= defIncrease // 방어구
                     }
+
+                    resetSuccessChance()
                 }
             }
             totalCost += currentEnhancingData.cost(itemLevel, enhancingLevel)
