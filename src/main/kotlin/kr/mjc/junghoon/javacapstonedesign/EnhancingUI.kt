@@ -2,6 +2,8 @@ package kr.mjc.junghoon.javacapstonedesign
 
 import javax.swing.*
 import java.awt.*
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 
 class EnhancingUI(private val itemType: String?,
                   private val jobType: String?,
@@ -157,6 +159,12 @@ class EnhancingUI(private val itemType: String?,
                 if (miniGameCheckBox.isSelected) {
                     val miniGame = MiniGame(this@EnhancingUI, logic)
                     miniGame.isVisible = true
+                    this@EnhancingUI.isEnabled = false
+                    miniGame.addWindowListener(object : WindowAdapter() {
+                        override fun windowClosed(e: WindowEvent?) {
+                            this@EnhancingUI.isEnabled = true
+                        }
+                    })
                 }
                 else {
                     logic.simulateItem()
