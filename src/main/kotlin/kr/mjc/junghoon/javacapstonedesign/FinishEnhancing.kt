@@ -8,6 +8,7 @@ import kotlin.system.exitProcess
 class FinishUI(
     private val logic: Logic): JFrame() {
     private val exitButton = JButton("종료")
+    private val restartButton = JButton("다시 하기")
     private var finalEnhancingInfoLabel = JLabel()
 
     init {
@@ -62,9 +63,17 @@ class FinishUI(
 
         val buttonPanel = JPanel()
         buttonPanel.add(exitButton)
+        buttonPanel.add(restartButton)
         exitButton.addActionListener {
             if (logic.itemType != null && logic.jobType != null && logic.itemLevel != null) {
                 exitProcess(0)
+            }
+        }
+        restartButton.addActionListener {
+            if (logic.itemType != null && logic.jobType != null && logic.itemLevel != null) {
+                val itemSelectingUI = ItemSelectingUI()
+                itemSelectingUI.isVisible = true
+                isVisible = false // 현재 화면을 숨김
             }
         }
 
