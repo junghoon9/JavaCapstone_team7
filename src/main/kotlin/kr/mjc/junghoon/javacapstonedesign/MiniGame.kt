@@ -4,12 +4,12 @@ import javax.swing.*
 import java.awt.*
 import java.awt.event.*
 
-class MiniGame : JFrame() {
+class MiniGame(private val enhancingUI: EnhancingUI, private val logic: Logic) : JFrame() {
 
     private val countdownLabel = JLabel("5")
     private var countdown = 5
     private var timer: Timer? = null
-    var correctCount = 0
+    private var correctCount = 0
 
     init {
         title = "Mini Game"
@@ -52,6 +52,7 @@ class MiniGame : JFrame() {
             countdownLabel.text = countdown.toString()
             if (countdown == 0) {
                 timer?.stop()
+                startEnhancing()
                 dispose() // 프레임을 닫음
             }
         }
@@ -91,6 +92,13 @@ class MiniGame : JFrame() {
         })
     }
 
+    private fun startEnhancing() {
+        logic.updateSuccessChance(correctCount)
+        logic.simulateItem()
+        enhancingUI.updateEnhancingInfo(logic)
+        enhancingUI.miniGameCheckBox.isSelected = false
+    }
+
     private fun handleKeyPress(direction: String) {
         val arrowPanel = (contentPane.components.find { it is JPanel } as? JPanel)?.
         components?.getOrNull(1) as? JPanel
@@ -101,24 +109,11 @@ class MiniGame : JFrame() {
                 arrowLabel.isVisible = false
                 correctCount++
                 if (correctCount == 4) {
+                    timer?.stop()
+                    startEnhancing()
                     dispose()
                 }
             }
         }
     }
-
-    fun getCorrect(): Int {
-        return correctCount
-    }
-
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            SwingUtilities.invokeLater {
-                val miniGame = MiniGame()
-                miniGame.isVisible = true
-            }
-        }
-    }
 }
-
