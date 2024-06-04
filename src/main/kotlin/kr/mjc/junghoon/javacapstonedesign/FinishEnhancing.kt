@@ -1,4 +1,4 @@
-package kr.mjc.junghoon.javacapstonedesign
+package kr.mjc.junghoon.javacapstonedesign.main
 
 import java.awt.BorderLayout
 import java.awt.Font
@@ -6,7 +6,8 @@ import javax.swing.*
 import kotlin.system.exitProcess
 
 class FinishUI(
-    private val logic: Logic): JFrame() {
+    private val logic: Logic
+): JFrame() {
     private val exitButton = JButton("종료")
     private val restartButton = JButton("다시 하기")
     private var finalEnhancingInfoLabel = JLabel()

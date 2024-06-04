@@ -1,4 +1,4 @@
-package kr.mjc.junghoon.javacapstonedesign
+package kr.mjc.junghoon.javacapstonedesign.main
 
 import java.text.NumberFormat
 import java.util.*
@@ -79,7 +79,7 @@ class Logic(
         }
     }
 
-    fun resetSuccessChance() {
+    private fun resetSuccessChance() {
         enhancingData = (0..24).associateWith {
             EnhancingData(
                 successChance = { enhancingLevel -> successChance(enhancingLevel, 0.0) },

@@ -1,4 +1,4 @@
-package kr.mjc.junghoon.javacapstonedesign
+package kr.mjc.junghoon.javacapstonedesign.main
 
 import javax.swing.*
 import java.awt.*
@@ -13,7 +13,7 @@ class MiniGame(private val enhancingUI: EnhancingUI, private val logic: Logic) :
 
     init {
         title = "Mini Game"
-        defaultCloseOperation = EXIT_ON_CLOSE
+        defaultCloseOperation = DISPOSE_ON_CLOSE/*EXIT_ON_CLOSE*/
         setSize(600, 400)
         layout = BorderLayout()
 

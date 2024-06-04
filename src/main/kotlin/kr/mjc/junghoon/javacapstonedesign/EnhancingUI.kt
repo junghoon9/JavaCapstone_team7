@@ -1,4 +1,4 @@
-package kr.mjc.junghoon.javacapstonedesign
+package kr.mjc.junghoon.javacapstonedesign.main
 
 import javax.swing.*
 import java.awt.*
@@ -8,7 +8,8 @@ import java.awt.event.WindowEvent
 class EnhancingUI(private val itemType: String?,
                   private val jobType: String?,
                   private val itemLevel: Int?,
-                  private val logic: Logic) : JFrame() {
+                  private val logic: Logic
+) : JFrame() {
     private val startButton = JButton("강화 시작")
     private val endButton = JButton("강화 종료")
     val miniGameCheckBox = JCheckBox("미니게임 실행")

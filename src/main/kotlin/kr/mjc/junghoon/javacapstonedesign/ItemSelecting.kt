@@ -1,4 +1,4 @@
-package kr.mjc.junghoon.javacapstonedesign
+package kr.mjc.junghoon.javacapstonedesign.main
 
 import javax.swing.*
 import java.awt.*
@@ -27,22 +27,55 @@ class ItemSelectingUI : JFrame(), ActionListener {
         defaultCloseOperation = EXIT_ON_CLOSE
         setSize(800, 600)
         setLocationRelativeTo(null)
-        layout = GridLayout(4, 2)
+        layout = GridBagLayout()
 
-        add(itemTypeLabel)
-        add(itemTypeComboBox)
-        add(jobTypeLabel)
-        add(jobTypeComboBox)
-        add(levelLabel)
-        add(levelTextField)
+        val gbc = GridBagConstraints().apply {
+            gridx = 0
+            gridy = 0
+            insets = Insets(5, 5, 5, 5)
+            anchor = GridBagConstraints.LINE_END
+        }
+        add(itemTypeLabel, gbc)
+
+        gbc.gridx = 1
+        gbc.anchor = GridBagConstraints.LINE_START
+        add(itemTypeComboBox, gbc)
+
+        gbc.gridx = 0
+        gbc.gridy = 1
+        gbc.anchor = GridBagConstraints.LINE_END
+        add(jobTypeLabel, gbc)
+
+        gbc.gridx = 1
+        gbc.anchor = GridBagConstraints.LINE_START
+        add(jobTypeComboBox, gbc)
+
+        gbc.gridx = 0
+        gbc.gridy = 2
+        gbc.anchor = GridBagConstraints.LINE_END
+        add(levelLabel, gbc)
+
+        gbc.gridx = 1
+        gbc.anchor = GridBagConstraints.LINE_START
+        add(levelTextField, gbc)
+
+        val buttonPanel = JPanel(GridLayout(1, 2, 10, 0)).apply {
+            border = BorderFactory.createEmptyBorder(10, 0, 10, 0)
+        }
 
         val startButton = JButton("강화 시작")
         startButton.addActionListener(this)
-        add(startButton)
+        buttonPanel.add(startButton)
 
         val backButton = JButton("뒤로 가기")
         backButton.addActionListener(this)
-        add(backButton)
+        buttonPanel.add(backButton)
+
+        gbc.gridx = 0
+        gbc.gridy = 3
+        gbc.gridwidth = 2
+        gbc.anchor = GridBagConstraints.CENTER
+        add(buttonPanel, gbc)
     }
 
     override fun actionPerformed(e: ActionEvent?) {
@@ -55,7 +88,7 @@ class ItemSelectingUI : JFrame(), ActionListener {
                 var isValid = true
 
                 if (selectedItemType == null) {
-                    itemTypeLabel.text = "아이템 종류: (아이템 종류를 선택하세요)"
+                    itemTypeLabel.text = "아이템 종류:(아이템 종류를 선택하세요)"
                     itemTypeLabel.foreground = Color.RED
                     isValid = false
                 } else {
@@ -64,7 +97,7 @@ class ItemSelectingUI : JFrame(), ActionListener {
                 }
 
                 if (selectedJobType == null) {
-                    jobTypeLabel.text = "착용 직업군: (착용 직업군을 선택하세요)"
+                    jobTypeLabel.text = "착용 직업군:(착용 직업군을 선택하세요)"
                     jobTypeLabel.foreground = Color.RED
                     isValid = false
                 } else {
@@ -73,7 +106,7 @@ class ItemSelectingUI : JFrame(), ActionListener {
                 }
 
                 if (selectedLevel == null || selectedLevel !in 1..300) {
-                    levelLabel.text = "착용 레벨(1-300): (올바른 착용 레벨을 입력하세요)"
+                    levelLabel.text = "착용 레벨(1-300):(올바른 착용 레벨을 입력하세요)"
                     levelLabel.foreground = Color.RED
                     isValid = false
                 } else {
@@ -89,8 +122,8 @@ class ItemSelectingUI : JFrame(), ActionListener {
                 }
             }
             "뒤로 가기" -> {
-                val startUI = StartUI()
-                startUI.isVisible = true
+                val startAfterLoginUI = StartAfterLoginUI()
+                startAfterLoginUI.isVisible = true
                 isVisible = false // 현재 화면을 숨김
             }
         }
