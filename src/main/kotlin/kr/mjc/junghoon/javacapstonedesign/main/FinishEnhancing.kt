@@ -6,7 +6,8 @@ import javax.swing.*
 import kotlin.system.exitProcess
 
 class FinishUI(
-    private val logic: Logic
+    private val logic: Logic,
+    private val loggedInUserID: String
 ): JFrame() {
     private val exitButton = JButton("종료")
     private val restartButton = JButton("다시 하기")
@@ -72,29 +73,15 @@ class FinishUI(
         }
         restartButton.addActionListener {
             if (logic.itemType != null && logic.jobType != null && logic.itemLevel != null) {
-                val itemSelectingUI = ItemSelectingUI()
-                itemSelectingUI.isVisible = true
+                SwingUtilities.invokeLater {
+                    val itemSelectingUI = ItemSelectingUI(loggedInUserID)
+                    itemSelectingUI.isVisible = true
+                }
                 isVisible = false // 현재 화면을 숨김
             }
         }
 
         add(finalEnhancingInfoPanel, BorderLayout.CENTER)
         add(buttonPanel, BorderLayout.SOUTH)
-    }
-}
-
-fun main() {
-    SwingUtilities.invokeLater {
-        val itemSelectingUI = ItemSelectingUI()
-        itemSelectingUI.isVisible = false
-
-        // ItemSelectingUI 클래스에서 선택한 아이템 종류와 직업군을 가져옴
-        val it = itemSelectingUI.selectedItemType
-        val jt = itemSelectingUI.selectedJobType
-        val il = itemSelectingUI.selectedLevel
-        val lg = Logic(it, jt, il)
-
-        val finishUI = FinishUI(lg)
-        finishUI.isVisible = true
     }
 }
