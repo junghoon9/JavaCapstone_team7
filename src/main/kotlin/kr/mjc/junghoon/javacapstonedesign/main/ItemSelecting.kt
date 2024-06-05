@@ -5,7 +5,7 @@ import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 
-class ItemSelectingUI : JFrame(), ActionListener {
+class ItemSelectingUI(private val loggedInUserID: String) : JFrame(), ActionListener {
     private val itemTypes = arrayOf(null, "무기", "방어구")
     private val jobTypes = arrayOf(null, "전사", "궁수", "마법사", "도적")
 
@@ -18,9 +18,9 @@ class ItemSelectingUI : JFrame(), ActionListener {
     private val levelLabel = JLabel("착용 레벨(1-300):")
 
     // 아이템 종류와 직업군 및 레벨을 저장할 변수
-    var selectedItemType: String? = null
-    var selectedJobType: String? = null
-    var selectedLevel: Int? = null
+    private var selectedItemType: String? = null
+    private var selectedJobType: String? = null
+    private var selectedLevel: Int? = null
 
     init {
         title = "아이템 강화"
@@ -115,24 +115,21 @@ class ItemSelectingUI : JFrame(), ActionListener {
                 }
 
                 if (isValid) {
-                    isVisible = false
                     val logic = Logic(selectedItemType, selectedJobType, selectedLevel)
-                    val enhancingUI = EnhancingUI(selectedItemType, selectedJobType, selectedLevel, logic)
-                    enhancingUI.isVisible = true
+                    logic.simulateItem()
+
+                    SwingUtilities.invokeLater {
+                        val enhancingUI = EnhancingUI(selectedItemType, selectedJobType, selectedLevel, logic, loggedInUserID)
+                        enhancingUI.isVisible = true
+                    }
+                    isVisible = false
                 }
             }
             "뒤로 가기" -> {
-                val startAfterLoginUI = StartAfterLoginUI()
+                val startAfterLoginUI = StartAfterLoginUI(loggedInUserID)
                 startAfterLoginUI.isVisible = true
                 isVisible = false // 현재 화면을 숨김
             }
         }
-    }
-}
-
-fun main() {
-    SwingUtilities.invokeLater {
-        val itemSelectingUI = ItemSelectingUI()
-        itemSelectingUI.isVisible = true
     }
 }
