@@ -9,7 +9,7 @@ import java.awt.Insets
 import javax.swing.*
 
 class LoginUI : JFrame() {
-    private val dbHelper = DatabaseHelper()
+    private val userManager = UserManager()
 
     init {
         title = "로그인"
@@ -69,9 +69,11 @@ class LoginUI : JFrame() {
             val userID = loginUserIDField.text
             val password = String(loginPasswordField.password)
             if (userID.isNotBlank() && password.isNotBlank()) {
-                if (dbHelper.getUser(userID, password)) {
-                    val startAfterLoginUI = StartAfterLoginUI()
-                    startAfterLoginUI.isVisible = true
+                if (userManager.login(userID, password)) {
+                    SwingUtilities.invokeLater {
+                        val startAfterLoginUI = StartAfterLoginUI(userID)
+                        startAfterLoginUI.isVisible = true
+                    }
                     isVisible = false
                 } else {
                     messageLabel.text = "아이디 또는 비밀번호가 틀립니다."
@@ -220,11 +222,11 @@ class LoginUI : JFrame() {
         confirmDialog.add(messageLabel, gbc)
 
         confirmButton.addActionListener {
-            if (dbHelper.checkUserIDExists(userID)) {
+            if (userManager.checkUserIDExists(userID)) {
                 messageLabel.text = "아이디가 이미 존재합니다."
             }
             else {
-                if (dbHelper.insertUser(userID, password, username)) {
+                if (userManager.register(userID, password, username)) {
                     JOptionPane.showMessageDialog(confirmDialog, "회원가입 성공!",
                         "회원가입", JOptionPane.INFORMATION_MESSAGE)
                     confirmDialog.dispose()
@@ -243,11 +245,5 @@ class LoginUI : JFrame() {
         confirmDialog.setSize(800, 600)
         confirmDialog.setLocationRelativeTo(this)
         confirmDialog.isVisible = true
-    }
-}
-
-fun main() {
-    SwingUtilities.invokeLater {
-        LoginUI().isVisible = true
     }
 }
