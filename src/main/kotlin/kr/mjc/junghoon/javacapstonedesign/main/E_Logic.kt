@@ -2,7 +2,6 @@ package kr.mjc.junghoon.javacapstonedesign.main
 
 import java.text.NumberFormat
 import java.util.*
-import javax.swing.SwingUtilities
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -208,18 +207,5 @@ class Logic(
             }
             totalCost += currentEnhancingData.cost(itemLevel, enhancingLevel)
         }
-    }
-}
-
-fun main() {
-    SwingUtilities.invokeLater {
-        val itemSelectingUI = ItemSelectingUI()
-        itemSelectingUI.isVisible = false
-
-        val it = itemSelectingUI.selectedItemType
-        val jt = itemSelectingUI.selectedJobType
-        val il = itemSelectingUI.selectedLevel
-        val logic = Logic(it, jt, il)
-        logic.simulateItem()
     }
 }
