@@ -8,8 +8,9 @@ import java.awt.event.WindowEvent
 class EnhancingUI(private val itemType: String?,
                   private val jobType: String?,
                   private val itemLevel: Int?,
-                  private val logic: Logic
-) : JFrame() {
+                  private val logic: Logic,
+                  private val loggedInUserID: String
+    ) : JFrame() {
     private val startButton = JButton("강화 시작")
     private val endButton = JButton("강화 종료")
     val miniGameCheckBox = JCheckBox("미니게임 실행")
@@ -56,7 +57,7 @@ class EnhancingUI(private val itemType: String?,
 
         // 최대 강화차수에 도달했는지 확인
         if (logic.enhancingLevel >= logic.maxEnhancingLevel) {
-            val finishUI = FinishUI(logic)
+            val finishUI = FinishUI(logic, loggedInUserID)
             finishUI.isVisible = true
             this@EnhancingUI.dispose() // 현재 창 닫기
             return
@@ -178,7 +179,7 @@ class EnhancingUI(private val itemType: String?,
         buttonPanel.add(endButton)
         endButton.addActionListener{
             if (itemType != null && jobType != null && itemLevel != null) {
-                val finishUI = FinishUI(logic)
+                val finishUI = FinishUI(logic, loggedInUserID)
                 finishUI.isVisible = true
                 isVisible = false
             }
@@ -187,22 +188,5 @@ class EnhancingUI(private val itemType: String?,
         add(imagePanel, BorderLayout.WEST)
         add(enhancingInfoPanel, BorderLayout.CENTER)
         add(buttonPanel, BorderLayout.SOUTH)
-    }
-}
-
-fun main() {
-    SwingUtilities.invokeLater {
-        val itemSelectingUI = ItemSelectingUI()
-        itemSelectingUI.isVisible = false
-
-        // ItemSelectingUI 클래스에서 선택한 아이템 종류와 직업군을 가져옴
-        val it = itemSelectingUI.selectedItemType
-        val jt = itemSelectingUI.selectedJobType
-        val il = itemSelectingUI.selectedLevel
-        val lg = Logic(it, jt, il)
-
-        // EnhancingUI 클래스의 인스턴스를 생성할 때 선택한 아이템 종류와 직업군을 전달
-        val enhancingUI = EnhancingUI(it, jt, il, lg)
-        enhancingUI.isVisible = true
     }
 }
