@@ -1,17 +1,25 @@
 package kr.mjc.junghoon.javacapstonedesign.login
 
 class UserManager {
-    private val users = mutableListOf<User>()
+    private val dbHelper = DatabaseHelper()
 
-    fun register(username: String, userId: String, password: String): Boolean {
-        if (users.any { it.userId == userId }) {
-            return false // 이미 존재하는 사용자
-        }
-        users.add(User(username, userId, password))
-        return true
+    fun register(username: String, userID: String, password: String): Boolean {
+        return dbHelper.insertUser(userID, password, username)
     }
 
     fun login(userId: String, password: String): Boolean {
-        return users.any { it.userId == userId && it.password == password }
+        return dbHelper.getUser(userId, password)
+    }
+
+    fun checkUserIDExists(userID: String): Boolean {
+        return dbHelper.checkUserIDExists(userID)
+    }
+
+    fun getUsernameByUserID(userID: String): String {
+        return dbHelper.getUsernameByUserID(userID)
+    }
+
+    fun withdrawUser(userID: String, password: String): Boolean {
+        return dbHelper.withdrawUser(userID, password)
     }
 }
