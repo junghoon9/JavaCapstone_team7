@@ -92,4 +92,42 @@ class DatabaseHelper {
             false
         }
     }
+
+    fun getUsernameByUserID(userID: String): String {
+        val sql = "SELECT username FROM users WHERE userID = ?"
+        return try {
+            DriverManager.getConnection(url).use { conn ->
+                conn.prepareStatement(sql).use { prepareStatement ->
+                    prepareStatement.setString(1, userID)
+                    prepareStatement.executeQuery().use { rs ->
+                        if (rs.next()) {
+                            rs.getString("username")
+                        }
+                        else ""
+                    }
+                }
+            }
+        }
+        catch (e: SQLException) {
+            println("Error retrieving username: ${e.message}")
+            ""
+        }
+    }
+
+    fun withdrawUser(userID: String, password: String): Boolean {
+        val sql = "DELETE FROM users WHERE userID = ? AND password = ?;"
+        return try {
+            DriverManager.getConnection(url).use { conn ->
+                conn.prepareStatement(sql).use { preparedStatement ->
+                    preparedStatement.setString(1, userID)
+                    preparedStatement.setString(2, password)
+                    preparedStatement.executeUpdate() > 0
+                }
+            }
+        }
+        catch (e: SQLException) {
+            println("Error withdrawing user: ${e.message}")
+            false
+        }
+    }
 }
