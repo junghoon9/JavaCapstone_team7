@@ -29,35 +29,12 @@ class ItemSelectingUI(private val loggedInUserID: String) : JFrame(), ActionList
         setLocationRelativeTo(null)
         layout = GridBagLayout()
 
-        val gbc = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 0
-            insets = Insets(5, 5, 5, 5)
-            anchor = GridBagConstraints.LINE_END
-        }
-        add(itemTypeLabel, gbc)
-
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
-        add(itemTypeComboBox, gbc)
-
-        gbc.gridx = 0
-        gbc.gridy = 1
-        gbc.anchor = GridBagConstraints.LINE_END
-        add(jobTypeLabel, gbc)
-
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
-        add(jobTypeComboBox, gbc)
-
-        gbc.gridx = 0
-        gbc.gridy = 2
-        gbc.anchor = GridBagConstraints.LINE_END
-        add(levelLabel, gbc)
-
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
-        add(levelTextField, gbc)
+        add(itemTypeLabel, createGridBagConstraints(0, 0, GridBagConstraints.LINE_END))
+        add(itemTypeComboBox, createGridBagConstraints(1, 0, GridBagConstraints.LINE_START))
+        add(jobTypeLabel, createGridBagConstraints(0, 1, GridBagConstraints.LINE_END))
+        add(jobTypeComboBox, createGridBagConstraints(1, 1, GridBagConstraints.LINE_START))
+        add(levelLabel, createGridBagConstraints(0, 2, GridBagConstraints.LINE_END))
+        add(levelTextField, createGridBagConstraints(1, 2, GridBagConstraints.LINE_START))
 
         val buttonPanel = JPanel(GridLayout(1, 2, 10, 0)).apply {
             border = BorderFactory.createEmptyBorder(10, 0, 10, 0)
@@ -71,11 +48,7 @@ class ItemSelectingUI(private val loggedInUserID: String) : JFrame(), ActionList
         backButton.addActionListener(this)
         buttonPanel.add(backButton)
 
-        gbc.gridx = 0
-        gbc.gridy = 3
-        gbc.gridwidth = 2
-        gbc.anchor = GridBagConstraints.CENTER
-        add(buttonPanel, gbc)
+        add(buttonPanel, createGridBagConstraints(0, 3, GridBagConstraints.CENTER, gridWidth = 2))
     }
 
     override fun actionPerformed(e: ActionEvent?) {
@@ -130,6 +103,24 @@ class ItemSelectingUI(private val loggedInUserID: String) : JFrame(), ActionList
                 startAfterLoginUI.isVisible = true
                 isVisible = false // 현재 화면을 숨김
             }
+        }
+    }
+
+    private fun createGridBagConstraints(
+        gridX: Int,
+        gridY: Int,
+        anchor: Int,
+        insets: Insets = Insets(5, 5, 5, 5),
+        ipadX: Int = 0,
+        gridWidth: Int = 1
+    ): GridBagConstraints {
+        return GridBagConstraints().apply {
+            gridx = gridX
+            gridy = gridY
+            this.anchor = anchor
+            this.insets = insets
+            ipadx = ipadX
+            gridwidth = gridWidth
         }
     }
 }
