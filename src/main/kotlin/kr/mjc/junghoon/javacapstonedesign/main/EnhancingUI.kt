@@ -10,14 +10,13 @@ class EnhancingUI(private val itemType: String?,
                   private val itemLevel: Int?,
                   private val logic: Logic,
                   private val loggedInUserID: String
-    ) : JFrame() {
+) : JFrame() {
     private val startButton = JButton("강화 시작")
     private val endButton = JButton("강화 종료")
     val miniGameCheckBox = JCheckBox("미니게임 실행")
     private var enhancingInfoLabel = JLabel()
 
-    fun updateEnhancingInfo(logic: Logic) {
-        // logic 객체에서 강화 정보 가져오기
+    private fun getEnhancingInfoText(logic: Logic): String {
         val ehcLevel = logic.enhancingLevel
         val statN = logic.statName
         val statInc = logic.statIncrease
@@ -28,43 +27,29 @@ class EnhancingUI(private val itemType: String?,
         val fChance = logic.getFailureChance()
         val cost = logic.getCost()
 
-        // 강화 정보 업데이트
-        val enhancingInfoText = when (itemType) {
+        return when (itemType) {
             "무기" -> {
                 "<html>" +
-                "$ehcLevel 강 -> ${ehcLevel + 1} 강<br><br>" +
-                "$statN: +$statInc<br>" +
-                "$powerOrDefenceN: +$powerInc<br><br>" +
-                "성공확률: $sChance %<br>" +
-                "실패확률: $fChance %<br><br>" +
-                "강화비용: $cost 골드<br>" +
-                "</html>"
+                        "$ehcLevel 강 -> ${ehcLevel + 1} 강<br><br>" +
+                        "$statN: +$statInc<br>" +
+                        "$powerOrDefenceN: +$powerInc<br><br>" +
+                        "성공확률: $sChance %<br>" +
+                        "실패확률: $fChance %<br><br>" +
+                        "강화비용: $cost 골드<br>" +
+                        "</html>"
             }
             else -> { //방어구
                 "<html>" +
-                "$ehcLevel 강 -> ${ehcLevel + 1} 강<br><br>" +
-                "$statN: +$statInc<br>" +
-                "$powerOrDefenceN: +$defInc<br><br>" +
-                "성공확률: $sChance %<br>" +
-                "실패확률: $fChance %<br><br>" +
-                "강화비용: $cost 골드<br>" +
-                "</html>"
+                        "$ehcLevel 강 -> ${ehcLevel + 1} 강<br><br>" +
+                        "$statN: +$statInc<br>" +
+                        "$powerOrDefenceN: +$defInc<br><br>" +
+                        "성공확률: $sChance %<br>" +
+                        "실패확률: $fChance %<br><br>" +
+                        "강화비용: $cost 골드<br>" +
+                        "</html>"
             }
         }
-
-        // 강화 정보 레이블 업데이트
-        enhancingInfoLabel.text = enhancingInfoText
-
-        // 최대 강화차수에 도달했는지 확인
-        if (logic.enhancingLevel >= logic.maxEnhancingLevel) {
-            val finishUI = FinishUI(logic, loggedInUserID)
-            finishUI.isVisible = true
-            this@EnhancingUI.dispose() // 현재 창 닫기
-            return
-        }
     }
-
-
 
     init {
         title = "아이템 강화"
@@ -109,54 +94,21 @@ class EnhancingUI(private val itemType: String?,
         itemLabel.verticalAlignment = SwingConstants.CENTER
         imagePanel.add(itemLabel)
 
-
         // 우측에 강화 정보를 표시할 빈 영역
         val enhancingInfoPanel = JPanel()
-        val ehcLevel = logic.enhancingLevel
-        val statN = logic.statName
-        val statInc = logic.statIncrease
-        val powerOrDefenceN = logic.powerOrDefenceName
-        val powerInc = logic.powerIncrease
-        val defInc = logic.defIncrease
-        val sChance = logic.getSuccessChance()
-        val fChance = logic.getFailureChance()
-        val cost = logic.getCost()
-        val enhancingInfoText = when (itemType) {
-            "무기" -> {
-                "<html>" +
-                "$ehcLevel 강 -> ${ehcLevel + 1} 강<br><br>" +
-                "$statN: +$statInc<br>" +
-                "$powerOrDefenceN: +$powerInc<br><br>" +
-                "성공확률: $sChance %<br>" +
-                "실패확률: $fChance %<br><br>" +
-                "강화비용: $cost 골드<br>" +
-                "</html>"
-            }
-            else -> { // 방어구
-                "<html>" +
-                "$ehcLevel 강 -> ${ehcLevel + 1} 강<br><br>" +
-                "$statN: +$statInc<br>" +
-                "$powerOrDefenceN: +$defInc<br><br>" +
-                "성공확률: $sChance %<br>" +
-                "실패확률: $fChance %<br><br>" +
-                "강화비용: $cost 골드<br>" +
-                "</html>"
-            }
-        }
         val font = Font("Arial", Font.PLAIN, 30)
-        enhancingInfoLabel = JLabel(enhancingInfoText)
+        enhancingInfoLabel = JLabel(getEnhancingInfoText(logic))
         enhancingInfoLabel.font = font
 
         enhancingInfoPanel.add(enhancingInfoLabel)
         enhancingInfoPanel.add(miniGameCheckBox, BorderLayout.SOUTH)
-
 
         // 하단에 강화 시작 버튼과 강화 종료 버튼을 추가할 패널
         val buttonPanel = JPanel()
 
         // 강화 시작 버튼
         buttonPanel.add(startButton)
-        startButton.addActionListener{
+        startButton.addActionListener {
             if (itemType != null && jobType != null && itemLevel != null) {
                 if (miniGameCheckBox.isSelected) {
                     val miniGame = MiniGame(this@EnhancingUI, logic)
@@ -170,14 +122,14 @@ class EnhancingUI(private val itemType: String?,
                 }
                 else {
                     logic.simulateItem()
-                    this@EnhancingUI.updateEnhancingInfo(logic)
+                    updateEnhancingInfo(logic)
                 }
             }
         }
 
         // 강화 종료 버튼
         buttonPanel.add(endButton)
-        endButton.addActionListener{
+        endButton.addActionListener {
             if (itemType != null && jobType != null && itemLevel != null) {
                 val finishUI = FinishUI(logic, loggedInUserID)
                 finishUI.isVisible = true
@@ -188,5 +140,20 @@ class EnhancingUI(private val itemType: String?,
         add(imagePanel, BorderLayout.WEST)
         add(enhancingInfoPanel, BorderLayout.CENTER)
         add(buttonPanel, BorderLayout.SOUTH)
+    }
+
+    fun updateEnhancingInfo(logic: Logic) {
+        // 강화 정보 업데이트
+        val enhancingInfoText = getEnhancingInfoText(logic)
+
+        // 강화 정보 레이블 업데이트
+        enhancingInfoLabel.text = enhancingInfoText
+
+        // 최대 강화차수에 도달했는지 확인
+        if (logic.enhancingLevel >= logic.maxEnhancingLevel) {
+            val finishUI = FinishUI(logic, loggedInUserID)
+            finishUI.isVisible = true
+            this@EnhancingUI.dispose() // 현재 창 닫기
+        }
     }
 }
