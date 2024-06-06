@@ -5,21 +5,15 @@ import java.util.*
 import kotlin.math.pow
 import kotlin.random.Random
 
-class Logic(
-    val itemType: String?,
-    val jobType: String?,
-    val itemLevel: Int?) {
-    private var strength = 0
-    private var dexterity = 0
-    private var intelligence = 0
-    private var luck = 0
+class Logic(val itemType: String?,
+            val jobType: String?,
+            val itemLevel: Int?) {
 
-    // 직업에 따라 스탯 할당
     var stat = when (jobType) {
-        "전사" -> strength
-        "궁수" -> dexterity
-        "마법사" -> intelligence
-        else -> luck // 도적
+        "전사" -> 0
+        "궁수" -> 0
+        "마법사" -> 0
+        else -> 0 // 도적
     }
 
     var statName = when (jobType) {
@@ -30,14 +24,11 @@ class Logic(
     }
 
     var enhancingLevel = 0
-
-    private var ap = 0 // 공격력(attack power)
-    private var mp = 0 // 마력(magic power)
-    var def = 0 // 방어력
     var power = when (jobType) {
-        "마법사" -> mp
-        else -> ap // 전사, 궁수, 도적
+        "마법사" -> 0
+        else -> 0 // 전사, 궁수, 도적
     }
+    var def = 0 // 방어력
 
     var powerOrDefenceName = when (itemType) {
         "무기" -> when (jobType) {
@@ -57,7 +48,6 @@ class Logic(
         return NumberFormat.getNumberInstance(Locale.US).format(totalCost)
     }
 
-    // 최종 강화화면에 표시할 내용
     var successCount = 0
     var failureCount = 0
 
@@ -67,34 +57,22 @@ class Logic(
         val cost: (Int, Int) -> Int
     )
 
-    fun updateSuccessChance(correctCount: Int) {
-        val bonus = correctCount * 0.0125
-        enhancingData = (0..24).associateWith {
-            EnhancingData(
-                successChance = { enhancingLevel -> successChance(enhancingLevel, bonus) },
-                failureChance = { enhancingLevel -> failureChance(enhancingLevel, bonus) },
-                cost = { itemLevel, enhancingLevel -> cost(itemLevel, enhancingLevel) }
-            )
-        }
-    }
-
-    private fun resetSuccessChance() {
-        enhancingData = (0..24).associateWith {
-            EnhancingData(
-                successChance = { enhancingLevel -> successChance(enhancingLevel, 0.0) },
-                failureChance = { enhancingLevel -> failureChance(enhancingLevel, 0.0) },
-                cost = { itemLevel, enhancingLevel -> cost(itemLevel, enhancingLevel) }
-            )
-        }
-    }
-
-
     private var enhancingData = (0..24).associateWith {
         EnhancingData(
-            successChance = { enhancingLevel -> successChance(enhancingLevel, 0.0) },
-            failureChance = { enhancingLevel -> failureChance(enhancingLevel, 0.0) },
+            successChance = { enhancingLevel -> successChance(enhancingLevel) },
+            failureChance = { enhancingLevel -> failureChance(enhancingLevel) },
             cost = { itemLevel, enhancingLevel -> cost(itemLevel, enhancingLevel) }
         )
+    }
+
+    fun updateSuccessChance(correctCount: Int) {
+        val bonus = correctCount * 0.0125
+        enhancingData = enhancingData.mapValues { (enhancingLevel, data) ->
+            data.copy(
+                successChance = { successChance(enhancingLevel, bonus) },
+                failureChance = { failureChance(enhancingLevel, bonus) }
+            )
+        }
     }
 
     private fun cost(itemLevel: Int, enhancingLevel: Int): Int {
@@ -113,7 +91,7 @@ class Logic(
         }
     }
 
-    private fun successChance(enhancingLevel: Int, bonus: Double): Double {
+    private fun successChance(enhancingLevel: Int, bonus: Double = 0.0): Double {
         return when (enhancingLevel) {
             in 0 until 3 -> (0.95 - 0.05 * enhancingLevel) * (1 + bonus)
             in 3 until 15 -> (1 - 0.05 * enhancingLevel) * (1 + bonus)
@@ -130,7 +108,7 @@ class Logic(
         return String.format("%.2f", successChance * 100)
     }
 
-    private fun failureChance(enhancingLevel: Int, bonus: Double): Double {
+    private fun failureChance(enhancingLevel: Int, bonus: Double = 0.0): Double {
         return 1 - successChance(enhancingLevel, bonus)
     }
 
@@ -143,8 +121,7 @@ class Logic(
     var powerIncrease = 10
     var defIncrease = 10
 
-    // 아이템 레벨에 따른 최대 강화 단계 설정
-    val maxEnhancingLevel = when(itemLevel) {
+    val maxEnhancingLevel = when (itemLevel) {
         in Int.MIN_VALUE until 110 -> 5
         in 110 until 120 -> 10
         in 120 until 130 -> 15
@@ -152,24 +129,19 @@ class Logic(
         else -> 25
     }
 
-
     fun simulateItem() {
-
-        // 현재 강화 단계 < 최대 강화 단계
         if (enhancingLevel < maxEnhancingLevel) {
             val currentEnhancingData = enhancingData[enhancingLevel]
                 ?: error("No data for enhancing level $enhancingLevel")
 
-            // 맨 처음 강화 시도
             if (enhancingLevel == 0 && successCount == 0 && failureCount == 0) {
                 enhancingCost = currentEnhancingData.cost(itemLevel!!, enhancingLevel)
             }
 
             val chance = Random.nextDouble()
-            val bonus = (enhancingData[enhancingLevel]?.
-            successChance?.invoke(enhancingLevel) ?: 0.0) - successChance(enhancingLevel, 0.0)
+            val bonus = (enhancingData[enhancingLevel]?.successChance?.invoke(enhancingLevel)
+                ?: 0.0) - successChance(enhancingLevel)
 
-            //강화 성공
             if (chance < currentEnhancingData.successChance(enhancingLevel) + bonus) {
                 enhancingLevel++
                 successCount++
@@ -178,33 +150,27 @@ class Logic(
 
                 when (itemType) {
                     "무기" -> power += powerIncrease
-                    else -> def += defIncrease// 방어구
+                    else -> def += defIncrease // 방어구
                 }
 
-                resetSuccessChance()
-            }
+                updateSuccessChance(0)
+            } else {
+                failureCount++
+                enhancingCost = currentEnhancingData.cost(itemLevel!!, enhancingLevel)
 
-            //강화 실패
-            else {
-                // 0강, 10강, 15강, 20강에서 강화 실패 시 강화 단계 유지
-                if ((enhancingLevel == 0 || enhancingLevel == 10 || enhancingLevel == 15 || enhancingLevel == 20)) {
-                    failureCount++
-                    enhancingCost = currentEnhancingData.cost(itemLevel!!, enhancingLevel)
-                }
-                else { //그 이외에는 하락
+                if (enhancingLevel !in listOf(0, 10, 15, 20)) {
                     enhancingLevel--
-                    failureCount++
-                    enhancingCost = currentEnhancingData.cost(itemLevel!!, enhancingLevel)
                     stat -= statIncrease
 
                     when (itemType) {
                         "무기" -> power -= powerIncrease
                         else -> def -= defIncrease // 방어구
                     }
-
-                    resetSuccessChance()
                 }
+
+                updateSuccessChance(0)
             }
+
             totalCost += currentEnhancingData.cost(itemLevel, enhancingLevel)
         }
     }
