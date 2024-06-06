@@ -25,25 +25,16 @@ class LoginUI : JFrame() {
         val userIDLabel = JLabel("아이디:")
         val passwordLabel = JLabel("비밀번호:")
 
-        val gbc = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 0
-            insets = Insets(5, 5, 5, 5)
-            anchor = GridBagConstraints.LINE_END
-        }
+        var gbc = createGridBagConstraints(0, 0, GridBagConstraints.LINE_END)
         add(userIDLabel, gbc)
 
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
+        gbc = createGridBagConstraints(1, 0, GridBagConstraints.LINE_START)
         add(loginUserIDField, gbc)
 
-        gbc.gridx = 0
-        gbc.gridy = 1
-        gbc.anchor = GridBagConstraints.LINE_END
+        gbc = createGridBagConstraints(0, 1, GridBagConstraints.LINE_END)
         add(passwordLabel, gbc)
 
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
+        gbc = createGridBagConstraints(1, 1, GridBagConstraints.LINE_START)
         add(loginPasswordField, gbc)
 
         val buttonPanel = JPanel(GridLayout(3, 1, 0, 10)).apply {
@@ -53,15 +44,12 @@ class LoginUI : JFrame() {
         buttonPanel.add(registerButton)
         buttonPanel.add(backButton)
 
-        gbc.gridx = 0
-        gbc.gridy = 2
+        gbc = createGridBagConstraints(0, 2, GridBagConstraints.CENTER)
         gbc.gridwidth = 2
-        gbc.anchor = GridBagConstraints.CENTER
         add(buttonPanel, gbc)
 
         val messageLabel = JLabel("", SwingConstants.CENTER)
-        gbc.gridy = 3
-        gbc.anchor = GridBagConstraints.CENTER
+        gbc = createGridBagConstraints(0, 3, GridBagConstraints.CENTER)
         add(messageLabel, gbc)
 
         // 로그인 버튼 액션
@@ -113,36 +101,24 @@ class LoginUI : JFrame() {
 
         val userIDLabel = JLabel("아이디:")
         val passwordLabel = JLabel("비밀번호:")
-        val usernameLabel = JLabel("이름:")
+        val usernameLabel = JLabel("닉네임:")
 
-        val gbc = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 0
-            insets = Insets(5, 5, 5, 5)
-            anchor = GridBagConstraints.LINE_END
-        }
+        var gbc = createGridBagConstraints(0, 0, GridBagConstraints.LINE_END)
         registerDialog.add(userIDLabel, gbc)
 
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
+        gbc = createGridBagConstraints(1, 0, GridBagConstraints.LINE_START)
         registerDialog.add(regUserIDField, gbc)
 
-        gbc.gridx = 0
-        gbc.gridy = 1
-        gbc.anchor = GridBagConstraints.LINE_END
+        gbc = createGridBagConstraints(0, 1, GridBagConstraints.LINE_END)
         registerDialog.add(passwordLabel, gbc)
 
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
+        gbc = createGridBagConstraints(1, 1, GridBagConstraints.LINE_START)
         registerDialog.add(regPasswordField, gbc)
 
-        gbc.gridx = 0
-        gbc.gridy = 2
-        gbc.anchor = GridBagConstraints.LINE_END
+        gbc = createGridBagConstraints(0, 2, GridBagConstraints.LINE_END)
         registerDialog.add(usernameLabel, gbc)
 
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
+        gbc = createGridBagConstraints(1, 2, GridBagConstraints.LINE_START)
         registerDialog.add(regUsernameField, gbc)
 
         val buttonPanel = JPanel(GridLayout(2, 1, 0, 10)).apply {
@@ -151,14 +127,11 @@ class LoginUI : JFrame() {
         buttonPanel.add(regButton)
         buttonPanel.add(backButton)
 
-        gbc.gridx = 0
-        gbc.gridy = 3
+        gbc = createGridBagConstraints(0, 3, GridBagConstraints.CENTER)
         gbc.gridwidth = 2
-        gbc.anchor = GridBagConstraints.CENTER
         registerDialog.add(buttonPanel, gbc)
 
-        gbc.gridy = 4
-        gbc.anchor = GridBagConstraints.CENTER
+        gbc = createGridBagConstraints(0, 4, GridBagConstraints.CENTER)
         registerDialog.add(messageLabel, gbc)
 
         regButton.addActionListener {
@@ -169,7 +142,7 @@ class LoginUI : JFrame() {
                 registerDialog.dispose()
                 showConfirmDialog(userID, password, username)
             } else {
-                messageLabel.text = "아이디, 비밀번호, 사용자 이름을 입력해주세요."
+                messageLabel.text = "아이디, 비밀번호, 닉네임을 입력해주세요."
             }
         }
 
@@ -193,18 +166,13 @@ class LoginUI : JFrame() {
         val infoLabel = JLabel("<html>" +
                                     "아이디: $userID<br>" +
                                     "비밀번호: $password<br>" +
-                                    "사용자 이름: $username" +
+                                    "닉네임: $username" +
                                     "</html>")
         val confirmButton = JButton("확인")
         val cancelButton = JButton("취소")
         val messageLabel = JLabel("", SwingConstants.CENTER)
 
-        val gbc = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 0
-            insets = Insets(5, 5, 5, 5)
-            anchor = GridBagConstraints.CENTER
-        }
+        var gbc = createGridBagConstraints(0, 0, GridBagConstraints.CENTER)
         confirmDialog.add(infoLabel, gbc)
 
         val buttonPanel = JPanel(GridLayout(1, 2, 10, 0)).apply {
@@ -213,26 +181,37 @@ class LoginUI : JFrame() {
         buttonPanel.add(confirmButton)
         buttonPanel.add(cancelButton)
 
-        gbc.gridy = 1
-        gbc.anchor = GridBagConstraints.CENTER
+        gbc = createGridBagConstraints(0, 1, GridBagConstraints.CENTER)
         confirmDialog.add(buttonPanel, gbc)
 
-        gbc.gridy = 2
-        gbc.anchor = GridBagConstraints.CENTER
+        gbc = createGridBagConstraints(0, 2, GridBagConstraints.CENTER)
         confirmDialog.add(messageLabel, gbc)
 
         confirmButton.addActionListener {
-            if (userManager.checkUserIDExists(userID)) {
-                messageLabel.text = "아이디가 이미 존재합니다."
+            val nicknameRegex = Regex("^[a-zA-Z0-9가-힣][a-zA-Z0-9가-힣_]{0,10}[a-zA-Z0-9가-힣]$")
+
+            if (!username.matches(nicknameRegex)) {
+                messageLabel.text = "이 닉네임은 생성할 수 없습니다."
             }
+
             else {
-                if (userManager.register(userID, password, username)) {
-                    JOptionPane.showMessageDialog(confirmDialog, "회원가입 성공!",
-                        "회원가입", JOptionPane.INFORMATION_MESSAGE)
-                    confirmDialog.dispose()
+                if (userManager.checkUserIDExists(userID) && !userManager.checkUsernameExists(username)) {
+                    messageLabel.text = "이미 존재하는 아아디 입니다."
+                }
+                else if (!userManager.checkUserIDExists(userID) && userManager.checkUsernameExists(username)) {
+                    messageLabel.text = "이미 존재하는 닉네임 입니다."
+                }
+                else if (userManager.checkUserIDExists(userID) && userManager.checkUsernameExists(username)) {
+                    messageLabel.text = "이미 존재하는 아이디 및 닉네임 입니다."
                 }
                 else {
-                    messageLabel.text = "회원가입 실패: 오류가 발생했습니다."
+                    if (userManager.register(userID, password, username)) {
+                        JOptionPane.showMessageDialog(confirmDialog, "회원가입이 완료되었습니다.", null, JOptionPane.INFORMATION_MESSAGE)
+                        confirmDialog.dispose()
+                    }
+                    else {
+                        messageLabel.text = "오류가 발생하여 회원가입을 실패했습니다."
+                    }
                 }
             }
         }
@@ -245,5 +224,14 @@ class LoginUI : JFrame() {
         confirmDialog.setSize(800, 600)
         confirmDialog.setLocationRelativeTo(this)
         confirmDialog.isVisible = true
+    }
+
+    private fun createGridBagConstraints(gridX: Int, gridY: Int, anchor: Int): GridBagConstraints {
+        return GridBagConstraints().apply {
+            gridx = gridX
+            gridy = gridY
+            insets = Insets(5, 5, 5, 5)
+            this.anchor = anchor
+        }
     }
 }
