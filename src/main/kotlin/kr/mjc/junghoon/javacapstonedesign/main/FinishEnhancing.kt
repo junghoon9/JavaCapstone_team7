@@ -3,13 +3,10 @@ package kr.mjc.junghoon.javacapstonedesign.main
 import java.awt.BorderLayout
 import java.awt.Font
 import javax.swing.*
-import kotlin.system.exitProcess
 
-class FinishUI(
-    private val logic: Logic,
-    private val loggedInUserID: String
-): JFrame() {
-    private val exitButton = JButton("종료")
+class FinishUI(private val logic: Logic,
+               private val loggedInUserID: String): JFrame() {
+    private val homeButton = JButton("홈으로")
     private val restartButton = JButton("다시 하기")
     private var finalEnhancingInfoLabel = JLabel()
 
@@ -64,16 +61,22 @@ class FinishUI(
         finalEnhancingInfoPanel.add(finalEnhancingInfoLabel)
 
         val buttonPanel = JPanel()
-        buttonPanel.add(exitButton)
+        buttonPanel.add(homeButton)
         buttonPanel.add(restartButton)
-        exitButton.addActionListener {
+        homeButton.addActionListener {
             if (logic.itemType != null && logic.jobType != null && logic.itemLevel != null) {
-                exitProcess(0)
+                SwingUtilities.invokeLater {
+                    FinishUI(logic, loggedInUserID).dispose()
+                    val startAfterLoginUI = StartAfterLoginUI(loggedInUserID)
+                    startAfterLoginUI.isVisible = true
+                }
+                isVisible = false
             }
         }
         restartButton.addActionListener {
             if (logic.itemType != null && logic.jobType != null && logic.itemLevel != null) {
                 SwingUtilities.invokeLater {
+                    FinishUI(logic, loggedInUserID).dispose()
                     val itemSelectingUI = ItemSelectingUI(loggedInUserID)
                     itemSelectingUI.isVisible = true
                 }
