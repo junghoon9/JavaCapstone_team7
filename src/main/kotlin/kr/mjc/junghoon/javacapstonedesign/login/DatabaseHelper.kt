@@ -14,9 +14,9 @@ class DatabaseHelper {
         val sql = """
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL,
                 userID TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL
+                password TEXT NOT NULL,
+                username TEXT NOT NULL UNIQUE
             );
         """.trimIndent()
 
@@ -47,7 +47,12 @@ class DatabaseHelper {
         }
         catch (e: SQLException) {
             if (e.message?.contains("UNIQUE constraint failed") == true) {
-                println("아이디가 이미 존재합니다.: $userID")
+                if (e.message?.contains("username") == true) {
+                    println("이미 존재하는 닉네임 입니다.: $username")
+                }
+                else if (e.message?.contains("userID") == true) {
+                    println("이미 존재하는 아이디입니다.: $userID")
+                }
             }
             else {
                 println("Error inserting user.: ${e.message}")
@@ -82,6 +87,24 @@ class DatabaseHelper {
                 conn.prepareStatement(sql).use { prepareStatement ->
                     prepareStatement.setString(1, userID)
                     prepareStatement.executeQuery().use { rs ->
+                        rs.next()
+                    }
+                }
+            }
+        }
+        catch (e: SQLException) {
+            println("Error checking userID: ${e.message}")
+            false
+        }
+    }
+
+    fun checkUsernameExists(username: String): Boolean {
+        val sql = "SELECT * FROM users WHERE username = ?"
+        return try {
+            DriverManager.getConnection(url).use { conn ->
+                conn.prepareStatement(sql).use { preparedStatement ->
+                    preparedStatement.setString(1, username)
+                    preparedStatement.executeQuery().use { rs ->
                         rs.next()
                     }
                 }
