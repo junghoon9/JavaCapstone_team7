@@ -3,7 +3,7 @@ package kr.mjc.junghoon.javacapstonedesign.login
 class UserManager {
     private val dbHelper = DatabaseHelper()
 
-    fun register(username: String, userID: String, password: String): Boolean {
+    fun register(userID: String, password: String, username: String): Boolean {
         return dbHelper.insertUser(userID, password, username)
     }
 
@@ -13,6 +13,10 @@ class UserManager {
 
     fun checkUserIDExists(userID: String): Boolean {
         return dbHelper.checkUserIDExists(userID)
+    }
+
+    fun checkUsernameExists(username: String): Boolean {
+        return dbHelper.checkUsernameExists(username)
     }
 
     fun getUsernameByUserID(userID: String): String {
