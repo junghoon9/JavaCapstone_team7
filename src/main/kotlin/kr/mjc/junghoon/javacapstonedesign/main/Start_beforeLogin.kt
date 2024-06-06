@@ -21,42 +21,19 @@ class StartBeforeLoginUI : JFrame(), ActionListener {
         val titleLabel = JLabel("아이템 강화 시뮬레이션")
         titleLabel.horizontalAlignment = SwingConstants.CENTER
         titleLabel.font = titleLabel.font.deriveFont(24f)
-        val titleConstraints = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 0
-            insets = Insets(20, 0, 20, 0)
-        }
-        add(titleLabel, titleConstraints)
+        add(titleLabel, createGridBagConstraints(0, 0, GridBagConstraints.CENTER, Insets(20, 0, 20, 0)))
 
         val loginButton = JButton("로그인")
         loginButton.addActionListener(this)
-        val itemSetupConstraints = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 1
-            insets = Insets(10, 0, 10, 0)
-            ipadx = 48
-        }
-        add(loginButton, itemSetupConstraints)
+        add(loginButton, createGridBagConstraints(0, 1, GridBagConstraints.CENTER, Insets(10, 0, 10, 0), 48))
 
         val withdrawButton = JButton("회원탈퇴")
         withdrawButton.addActionListener(this)
-        val withdrawConstraints = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 2
-            insets = Insets(10, 0, 10, 0)
-            ipadx = 35
-        }
-        add(withdrawButton, withdrawConstraints)
+        add(withdrawButton, createGridBagConstraints(0, 2, GridBagConstraints.CENTER, Insets(10, 0, 10, 0), 35))
 
         val exitButton = JButton("종료")
         exitButton.addActionListener(this)
-        val exitConstraints = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 3
-            insets = Insets(10, 0, 20, 0)
-            ipadx = 60
-        }
-        add(exitButton, exitConstraints)
+        add(exitButton, createGridBagConstraints(0, 3, GridBagConstraints.CENTER, Insets(10, 0, 20, 0), 60))
     }
 
     override fun actionPerformed(e: ActionEvent?) {
@@ -87,26 +64,10 @@ class StartBeforeLoginUI : JFrame(), ActionListener {
         val cancelButton = JButton("취소")
         val messageLabel = JLabel("", SwingConstants.CENTER)
 
-        val gbc = GridBagConstraints().apply {
-            gridx = 0
-            gridy = 0
-            insets = Insets(5, 5, 5, 5)
-            anchor = GridBagConstraints.LINE_END
-        }
-        withdrawDialog.add(userIdLabel, gbc)
-
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
-        withdrawDialog.add(userIdField, gbc)
-
-        gbc.gridx = 0
-        gbc.gridy = 1
-        gbc.anchor = GridBagConstraints.LINE_END
-        withdrawDialog.add(passwordLabel, gbc)
-
-        gbc.gridx = 1
-        gbc.anchor = GridBagConstraints.LINE_START
-        withdrawDialog.add(passwordField, gbc)
+        withdrawDialog.add(userIdLabel, createGridBagConstraints(0, 0, GridBagConstraints.LINE_END))
+        withdrawDialog.add(userIdField, createGridBagConstraints(1, 0, GridBagConstraints.LINE_START))
+        withdrawDialog.add(passwordLabel, createGridBagConstraints(0, 1, GridBagConstraints.LINE_END))
+        withdrawDialog.add(passwordField, createGridBagConstraints(1, 1, GridBagConstraints.LINE_START))
 
         val buttonPanel = JPanel(GridLayout(1, 2, 10, 0)).apply {
             border = BorderFactory.createEmptyBorder(10, 0, 10, 0)
@@ -114,15 +75,8 @@ class StartBeforeLoginUI : JFrame(), ActionListener {
         buttonPanel.add(withdrawButton)
         buttonPanel.add(cancelButton)
 
-        gbc.gridx = 0
-        gbc.gridy = 2
-        gbc.gridwidth = 2
-        gbc.anchor = GridBagConstraints.CENTER
-        withdrawDialog.add(buttonPanel, gbc)
-
-        gbc.gridy = 3
-        gbc.anchor = GridBagConstraints.CENTER
-        withdrawDialog.add(messageLabel, gbc)
+        withdrawDialog.add(buttonPanel, createGridBagConstraints(0, 2, GridBagConstraints.CENTER, gridWidth = 2))
+        withdrawDialog.add(messageLabel, createGridBagConstraints(0, 3, GridBagConstraints.CENTER, gridWidth = 2))
 
         withdrawButton.addActionListener {
             val userID = userIdField.text
@@ -146,5 +100,23 @@ class StartBeforeLoginUI : JFrame(), ActionListener {
         withdrawDialog.setSize(400, 200)
         withdrawDialog.setLocationRelativeTo(this)
         withdrawDialog.isVisible = true
+    }
+
+    private fun createGridBagConstraints(
+        gridX: Int,
+        gridY: Int,
+        anchor: Int,
+        insets: Insets = Insets(5, 5, 5, 5),
+        ipadX: Int = 0,
+        gridWidth: Int = 1
+    ): GridBagConstraints {
+        return GridBagConstraints().apply {
+            gridx = gridX
+            gridy = gridY
+            this.anchor = anchor
+            this.insets = insets
+            ipadx = ipadX
+            gridwidth = gridWidth
+        }
     }
 }
